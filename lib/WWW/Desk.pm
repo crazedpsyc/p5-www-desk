@@ -15,6 +15,7 @@ use WWW::Desk::Group;
 use WWW::Desk::Macro;
 use WWW::Desk::Topic;
 use WWW::Desk::User;
+#use WWW::Desk::Interaction;
 
 our $VERSION ||= '0.0development';
 
@@ -99,6 +100,20 @@ sub request {
         die __PACKAGE__.' HTTP request failed: '.$response->status_line, "\n";
     }
 }
+use DDP;
+sub _make_obj_array {
+    my ( $self, $name, $path, $object, %args ) = @_;
+    my @raw = @{$self->request( GET => $path, %args )->{results}};
+    my @objects;
+    for (@raw) {
+        push @objects, $object->new(
+                id => $$_{$name}{id},
+                desk => $self,
+                obj => $_,
+        );
+    }
+    \@objects;
+}
 
 #
 # Topics
@@ -113,17 +128,7 @@ sub get_topic {
 
 sub get_topics {
     my ( $self, %args ) = @_;
-    my $raw = $self->request( GET => '/topics', %args );
-    my @topics;
-    my @rawtopics = @{$raw->{results}};
-    for (@rawtopics) {
-        push @topics, WWW::Desk::Topic->new(
-                id => $$_{topic}{id},
-                desk => $self,
-                obj => $_,
-        );
-    }
-    @topics;
+    $self->_make_obj_array("topic", "/topics", "WWW::Desk::Topic", %args);
 }
 
 sub create_topic {
@@ -154,6 +159,11 @@ sub get_case {
     );
 }
 
+sub get_cases {
+    my ( $self, %args ) = @_;
+    $self->_make_obj_array("case", "/cases", "WWW::Desk::Case", %args);
+}
+
 #
 # Customers
 #
@@ -163,6 +173,11 @@ sub get_customer {
             id => $id,
             desk => $self,
     );
+}
+
+sub get_customers {
+    my ( $self, %args ) = @_;
+    $self->_make_obj_array("customer", "/customers", "WWW::Desk::Customer", %args);
 }
 
 #
@@ -176,6 +191,12 @@ sub get_group {
     );
 }
 
+sub get_groups {
+    my ( $self, %args ) = @_;
+    $self->_make_obj_array("group", "/groups", "WWW::Desk::Group", %args);
+}
+
+
 #
 # Macros
 #
@@ -185,6 +206,16 @@ sub get_macro {
             id => $id,
             desk => $self,
     );
+}
+
+sub get_macros {
+    my ( $self, %args ) = @_;
+    $self->_make_obj_array("macro", "/macros", "WWW::Desk::Macro", %args);
+}
+
+sub create_macro {
+    my ( $self, %data ) = @_;
+    $self->request( 'POST', "/macros", %data );
 }
 
 #
@@ -197,6 +228,27 @@ sub get_user {
             desk => $self,
     );
 }
+
+sub get_users {
+    my ( $self, %args ) = @_;
+    $self->_make_obj_array("user", "/users", "WWW::Desk::User", %args);
+}
+
+#
+# Interactions
+#
+#sub get_interaction {
+#   my ( $self, $id ) = @_;
+#   WWW::Desk::Interaction->new( 
+#           id => $id,
+#           desk => $self,
+#   );
+#}
+
+#sub get_interactions {
+#   my ( $self, %args ) = @_;
+#   $self->_make_obj_array("interaction", "/interactions", "WWW::Desk::Interaction", %args);
+#}
 
 =head1 NAME
 

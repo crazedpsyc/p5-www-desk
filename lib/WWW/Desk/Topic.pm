@@ -31,7 +31,7 @@ sub show_in_portal { int(shift->obj->{topic}{show_in_portal}) }
 
 sub destroy {
     my ( $self ) = @_;
-    $self->desk->request( 'DELETE', '/topic/'.$self->id );
+    $self->desk->request( 'DELETE', '/topics/'.$self->id );
 }
 
 sub update {
@@ -41,16 +41,7 @@ sub update {
 
 sub get_articles {
     my ( $self, %args ) = @_;
-    my $raw = $self->desk->request( GET => "/topics/".$self->id."/articles", %args );
-    my @articles;
-    for (@{$raw->{results}}) {
-        push @articles, WWW::Desk::Article->new(
-                id => $$_{article}{id},
-                desk => $self->desk,
-                obj => $_,
-        );
-    }
-    @articles;
+    $self->desk->_make_obj_array("article", "/articles", "WWW::Desk::Article", %args);
 }
 
 sub create_article {

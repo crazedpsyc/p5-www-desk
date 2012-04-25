@@ -37,4 +37,29 @@ sub first_name   { shift->obj->{customer}{first_name} }
 sub custom_t2    { shift->obj->{customer}{custom_t2} }
 sub custom_t3    { shift->obj->{customer}{custom_t3} }
 
+sub update {
+    my ( $self, %data ) = @_;
+    $self->request( PUT => "/customers/".$self->id, %data );
+}
+
+sub create_email {
+    my ( $self, $email ) = @_;
+    $self->request( POST => "/customers/".$self->id."/emails", email => $email );
+}
+
+sub update_email {
+    my ( $self, $email ) = @_;
+    $self->request( PUT => "/customers/".$self->id."/emails", email => $email );
+}
+
+sub create_phone {
+    my ( $self, $phone ) = @_;
+    $self->request( POST => "/customers/".$self->id."/phones", phone => $phone );
+}
+
+sub update_phone {
+    my ( $self, $phone ) = @_;
+    $self->request( PUT => "/customers/".$self->id."/phones", phone => $phone );
+}
+
 1;
