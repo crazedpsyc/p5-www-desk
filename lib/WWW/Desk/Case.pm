@@ -64,6 +64,11 @@ sub preview             { shift->obj->{case}{preview} }
 sub macros              { shift->obj->{case}{macros} }
 sub articles            { shift->obj->{case}{articles} }
 
+sub update {
+    my ( $self, %data ) = @_;
+    $self->request( 'PUT', "/cases/".$self->id, %data );
+}
+
 
 1;
 

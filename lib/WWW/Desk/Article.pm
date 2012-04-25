@@ -53,4 +53,14 @@ sub get_translation {
     }
 }
 
+sub update {
+    my ( $self, %data ) = @_;
+    $self->request( 'PUT', "/articles/".$self->id, %data );
+}
+
+sub destroy {
+    my ( $self ) = @_;
+    $self->request( 'DELETE', "/articles/".$self->id );
+}
+
 1;
